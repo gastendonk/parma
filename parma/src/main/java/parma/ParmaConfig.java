@@ -5,6 +5,12 @@ import github.soltaufintel.amalia.git.RepositoryDefinition;
 public interface ParmaConfig {
 
     /**
+     * @return unique name for this configuration.
+     * Not used by parma lib.
+     */
+    String getName();
+    
+    /**
      * @return e.g. "http://grafana:9090"
      */
     String getPrometheusHost();
