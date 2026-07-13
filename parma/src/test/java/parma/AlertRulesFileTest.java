@@ -131,8 +131,6 @@ public class AlertRulesFileTest {
         Assert.assertEquals("""
                 groups:
                 - name: infrastruktur_alarme
-                  rules: [
-                    ]
                 """, file.yaml());
     }
 
@@ -185,8 +183,6 @@ public class AlertRulesFileTest {
             - name: group_2
               rules:
               - alert: was anderes
-                annotations: {
-                  }
                 expr: up == 0
                 for: 15s
                 labels:

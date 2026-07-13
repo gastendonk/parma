@@ -55,6 +55,11 @@ public abstract class YamlAccess {
 
         // 1. Die gesamte Struktur rekursiv bereinigen und strikt alphabetisch sortieren (TreeMaps)
         Object cleanedStructure = cleanAndSort(yaml);
+        
+        // Falls nach dem Filtern absolut nichts uebrig bleibt, leeren String zurueckgeben
+        if (cleanedStructure == null || (cleanedStructure instanceof Map && ((Map<?,?>) cleanedStructure).isEmpty())) {
+            return "";
+        }
 
         // 2. YAML-Optionen fuer schoenes Blockformat setzen
         DumperOptions options = new DumperOptions();
@@ -71,7 +76,7 @@ public abstract class YamlAccess {
     
     @SuppressWarnings("unchecked")
     private Object cleanAndSort(Object data) {
-        if (data == null) {
+        if (isEmptyOrNull(data)) {
             return null;
         }
 
@@ -85,9 +90,14 @@ public abstract class YamlAccess {
                 if ("yaml".equals(entry.getKey())) {
                     continue;
                 }
-                sortedMap.put(entry.getKey(), cleanAndSort(entry.getValue()));
+                
+                Object cleanedValue = cleanAndSort(entry.getValue());
+                // Nur hinzufuegen, wenn der bereinigte Inhalt nicht leer ist
+                if (!isEmptyOrNull(cleanedValue)) {
+                    sortedMap.put(entry.getKey(), cleanedValue);
+                }
             }
-            return sortedMap;
+            return sortedMap.isEmpty() ? null : sortedMap;
         }
 
         // Fall 2: Es ist eine Liste (wie unter "groups" oder "rules")
@@ -95,42 +105,67 @@ public abstract class YamlAccess {
             List<Object> srcList = (List<Object>) data;
             List<Object> cleanedList = new ArrayList<>();
             for (Object item : srcList) {
-                cleanedList.add(cleanAndSort(item));
+                Object cleanedItem = cleanAndSort(item);
+                // Nur gueltige Objekte in die Liste packen
+                if (!isEmptyOrNull(cleanedItem)) {
+                    cleanedList.add(cleanedItem);
+                }
             }
-            return cleanedList;
+            return cleanedList.isEmpty() ? null : cleanedList;
         }
 
         // Fall 3: Es ist dein echtes Java-Objekt (z.B. parma.AlertRule)
-        // Wir nutzen hier Reflection, um das POJO in eine TreeMap zu zerlegen
         if (data.getClass().getName().startsWith("parma.") || data.getClass().getSimpleName().contains("Alert")) {
             Map<String, Object> sortedMap = new TreeMap<>();
             try {
-                // Holt alle Getter/Properties ueber SnakeYAMLs eigenen Mechanismus
                 PropertyUtils utils = new PropertyUtils();
                 for (Property prop : utils.getProperties(data.getClass())) {
                     String name = prop.getName();
                     
-                    // Ignoriere das Feld "yaml" und das standardmaessige Class-Property von Java
                     if ("yaml".equals(name) || "class".equals(name)) {
                         continue;
                     }
                     
                     Object value = prop.get(data);
+                    Object cleanedValue = cleanAndSort(value);
                     
-                    // Prometheus erwartet im YAML "for", dein POJO nutzt aber "durationFor"
-                    String yamlKey = "durationFor".equals(name) ? "for" : name;
-                    
-                    sortedMap.put(yamlKey, cleanAndSort(value));
+                    // Nur Felder mit echten Werten mappen
+                    if (!isEmptyOrNull(cleanedValue)) {
+                        String yamlKey = "durationFor".equals(name) ? "for" : name;
+                        sortedMap.put(yamlKey, cleanedValue);
+                    }
                 }
             } catch (Exception e) {
-                // Fallback, falls Reflection fehlschlaegt
                 return data.toString();
             }
-            return sortedMap;
+            return sortedMap.isEmpty() ? null : sortedMap;
         }
 
         // Fall 4: Primitiver Datentyp (String, Integer, Boolean) -> Einfach zurueckgeben
         return data;
+    }
+
+    /**
+     * Prueft zentral, ob ein Objekt als "leer", null oder 0 zu betrachten ist.
+     */
+    private boolean isEmptyOrNull(Object obj) {
+        if (obj == null) {
+            return true;
+        }
+        if (obj instanceof String) {
+            return ((String) obj).trim().isEmpty();
+        }
+        if (obj instanceof Map) {
+            return ((Map<?, ?>) obj).isEmpty();
+        }
+        if (obj instanceof List) {
+            return ((List<?>) obj).isEmpty();
+        }
+        if (obj instanceof Number) {
+            // Faengt 0, 0.0, etc. ab
+            return ((Number) obj).doubleValue() == 0.0;
+        }
+        return false;
     }
     
     public void load(File file) throws IOException {

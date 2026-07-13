@@ -31,4 +31,9 @@ public class AlertRulesFile extends YamlAccess {
         getYaml().put("groups", groups);
         return group;
     }
+    
+    @Override
+    public String toString() {
+        return "FILE: " + getName();
+    }
 }

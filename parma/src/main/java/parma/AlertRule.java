@@ -44,6 +44,14 @@ public class AlertRule extends YamlAccess {
         setMap("annotations", annotations);
     }
     
+    public String getKeepFiringFor() {
+        return str("keep_firing_for");
+    }
+
+    public void setKeepFiringFor(String v) {
+        put("keep_firing_for", v);
+    }
+
     @Override
     public String toString() {
         return "ALERT RULE: '" + getAlert() + "' | " + getExpr() + " | for " + getDurationFor() + " | " + getLabels().toString();
