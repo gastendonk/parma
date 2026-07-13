@@ -4,11 +4,13 @@ plugins {
     id 'eclipse'
 }
 
+group = 'com.github.gastendonk'
 sourceCompatibility = JavaVersion.VERSION_17
 targetCompatibility = JavaVersion.VERSION_17
 
 java {
     withSourcesJar()
+    withJavadocJar()
 }
 
 tasks.withType(JavaCompile) {
@@ -29,8 +31,6 @@ repositories {
     maven { url 'https://jitpack.io' }
     maven { url 'https://www.javaxt.com/maven' }
 }
-
-group = 'com.github.gastendonk'
 
 publishing { // for jitpack.io
     publications {
