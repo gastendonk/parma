@@ -21,6 +21,7 @@ import parma.Silence.SilenceCreated;
 public class ParmaService {
     private static final String ENDPOINT1 = "/api/v2/silence/";
     private static final String ENDPOINT2 = "/api/v2/silences";
+    private static final String ENDPOINT3 = "/api/v1/query";
     private final ParmaConfig config;
 
     public ParmaService(ParmaConfig config) {
@@ -112,5 +113,13 @@ public class ParmaService {
     
     public void reloadAlertmanager() {
         REST.post(config.getAlertmanagerHost() + "/-/reload", "");
+    }
+    
+    public List<PrometheusResult> queryAlerts() {
+        return new REST(config.getPrometheusHost() + ENDPOINT3 + "?query=ALERTS")
+                .get()
+                .fromJson(PrometheusResponse.class)
+                .data()
+                .result();
     }
 }
