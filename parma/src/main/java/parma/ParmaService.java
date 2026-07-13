@@ -105,4 +105,12 @@ public class ParmaService {
     public void expireSilence(String id) {
         new REST(config.getAlertmanagerHost() + ENDPOINT1 + id).delete().close();
     }
+    
+    public void reloadPrometheus() {
+        REST.post(config.getPrometheusHost() + "/-/reload", "");
+    }
+    
+    public void reloadAlertmanager() {
+        REST.post(config.getAlertmanagerHost() + "/-/reload", "");
+    }
 }

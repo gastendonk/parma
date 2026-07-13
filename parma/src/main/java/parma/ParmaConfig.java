@@ -5,6 +5,11 @@ import github.soltaufintel.amalia.git.RepositoryDefinition;
 public interface ParmaConfig {
 
     /**
+     * @return e.g. "http://grafana:9090"
+     */
+    String getPrometheusHost();
+    
+    /**
      * @return e.g. "http://grafana:9093"
      */
     String getAlertmanagerHost();
