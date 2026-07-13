@@ -110,7 +110,7 @@ public abstract class YamlAccess {
                 for (Property prop : utils.getProperties(data.getClass())) {
                     String name = prop.getName();
                     
-                    // Ignoriere das Feld "yaml" und das standardmaeﬂige Class-Property von Java
+                    // Ignoriere das Feld "yaml" und das standardmaessige Class-Property von Java
                     if ("yaml".equals(name) || "class".equals(name)) {
                         continue;
                     }
