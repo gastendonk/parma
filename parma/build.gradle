@@ -1,0 +1,29 @@
+plugins {
+    id 'java-library'
+    id 'eclipse'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+        vendor = JvmVendorSpec.ADOPTIUM
+    }
+}
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+dependencies {
+    implementation 'com.github.SoltauFintel.amalia:amalia-http:3.0.0-a3'
+    implementation 'com.github.SoltauFintel.amalia:amalia-git:3.0.0-a3'
+    implementation 'org.yaml:snakeyaml:2.6'
+    implementation 'org.slf4j:slf4j-nop:2.0.17'
+    
+    testImplementation 'junit:junit:4.13.2'
+}
+
+repositories {
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://www.javaxt.com/maven' }
+}
