@@ -56,7 +56,7 @@ public abstract class YamlAccess {
         // 1. Die gesamte Struktur rekursiv bereinigen und strikt alphabetisch sortieren (TreeMaps)
         Object cleanedStructure = cleanAndSort(yaml);
 
-        // 2. YAML-Optionen für schönes Blockformat setzen
+        // 2. YAML-Optionen fuer schoenes Blockformat setzen
         DumperOptions options = new DumperOptions();
         options.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         options.setPrettyFlow(true);
@@ -81,7 +81,7 @@ public abstract class YamlAccess {
             Map<String, Object> sortedMap = new TreeMap<>();
             
             for (Map.Entry<String, Object> entry : srcMap.entrySet()) {
-                // Ignoriere das störende interne yaml-Feld überall
+                // Ignoriere das stoerende interne yaml-Feld ueberall
                 if ("yaml".equals(entry.getKey())) {
                     continue;
                 }
@@ -105,12 +105,12 @@ public abstract class YamlAccess {
         if (data.getClass().getName().startsWith("parma.") || data.getClass().getSimpleName().contains("Alert")) {
             Map<String, Object> sortedMap = new TreeMap<>();
             try {
-                // Holt alle Getter/Properties über SnakeYAMLs eigenen Mechanismus
+                // Holt alle Getter/Properties ueber SnakeYAMLs eigenen Mechanismus
                 PropertyUtils utils = new PropertyUtils();
                 for (Property prop : utils.getProperties(data.getClass())) {
                     String name = prop.getName();
                     
-                    // Ignoriere das Feld "yaml" und das standardmäßige Class-Property von Java
+                    // Ignoriere das Feld "yaml" und das standardmaeßige Class-Property von Java
                     if ("yaml".equals(name) || "class".equals(name)) {
                         continue;
                     }
@@ -123,13 +123,13 @@ public abstract class YamlAccess {
                     sortedMap.put(yamlKey, cleanAndSort(value));
                 }
             } catch (Exception e) {
-                // Fallback, falls Reflection fehlschlägt
+                // Fallback, falls Reflection fehlschlaegt
                 return data.toString();
             }
             return sortedMap;
         }
 
-        // Fall 4: Primitiver Datentyp (String, Integer, Boolean) -> Einfach zurückgeben
+        // Fall 4: Primitiver Datentyp (String, Integer, Boolean) -> Einfach zurueckgeben
         return data;
     }
     
