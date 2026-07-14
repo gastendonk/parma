@@ -61,7 +61,7 @@ public class ParmaService {
         rd.getLocalFolder().getParentFile().mkdirs();
         var repo = new Repository(rd);
         repo.pull(false);
-        if (files.getCommitHash() != null && files.getCommitHash().equals(repo.getCurrentCommitHash())) {
+        if (files.getCommitHash() != null && !files.getCommitHash().equals(repo.getCurrentCommitHash())) {
             throw new RuntimeException("Concurrent modification of alert rules files! It is not saved.");
         }
         var folder1 = rd.getLocalFolder();
