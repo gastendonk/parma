@@ -34,6 +34,7 @@ public class ParmaService {
     
     public AlertRulesFiles loadAlertRulesFiles() throws IOException {
         // Git part ----
+        config.getRepository().getLocalFolder().getParentFile().mkdirs();
         var repo = new Repository(config.getRepository());
         repo.pull(false);
         var id = repo.getCurrentCommitHash();
@@ -53,6 +54,7 @@ public class ParmaService {
     
     public void saveAlertRuleFiles(AlertRulesFiles files) {
         RepositoryDefinition rd = config.getRepository();
+        rd.getLocalFolder().getParentFile().mkdirs();
         var repo = new Repository(rd);
         repo.pull(false);
         if (files.getCommitHash() != null && files.getCommitHash().equals(repo.getCurrentCommitHash())) {
