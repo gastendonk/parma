@@ -32,7 +32,7 @@ public class ParmaService {
     // Die prometheus.yml muss ich nur lesen.
     // Die alert-rules yml files lesen und schreiben.
     
-    public AlertRulesFiles loadAlertRulesFiles() throws IOException {
+    public AlertRulesFiles loadAlertRulesFiles() {
         // Git part ----
         config.getRepository().getLocalFolder().getParentFile().mkdirs();
         var repo = new Repository(config.getRepository());
@@ -41,15 +41,19 @@ public class ParmaService {
         var folder1 = config.getRepository().getLocalFolder();
         
         // File part ----
-        AlertRulesFiles ret = new AlertRulesFiles();
-        ret.setCommitHash(id);
-        var folder2 = new File(folder1, config.getFolder());
-        var prometheusYaml = new PrometheusFile(folder2);
-        var reader = new AlertRulesFileReader();
-        for (String arf : prometheusYaml.getRuleFiles()) {
-            ret.add(reader.read(new File(folder2, arf)));
+        try {
+            AlertRulesFiles ret = new AlertRulesFiles();
+            ret.setCommitHash(id);
+            var folder2 = new File(folder1, config.getFolder());
+            var prometheusYaml = new PrometheusFile(folder2);
+            var reader = new AlertRulesFileReader();
+            for (String arf : prometheusYaml.getRuleFiles()) {
+                ret.add(reader.read(new File(folder2, arf)));
+            }
+            return ret;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return ret;
     }
     
     public void saveAlertRuleFiles(AlertRulesFiles files) {
@@ -58,7 +62,7 @@ public class ParmaService {
         var repo = new Repository(rd);
         repo.pull(false);
         if (files.getCommitHash() != null && files.getCommitHash().equals(repo.getCurrentCommitHash())) {
-            throw new RuntimeException("Concurrent modification of alert rules files!");
+            throw new RuntimeException("Concurrent modification of alert rules files! It is not saved.");
         }
         var folder1 = rd.getLocalFolder();
         
