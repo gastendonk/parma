@@ -18,8 +18,8 @@ tasks.withType(JavaCompile) {
 }
 
 dependencies {
-    implementation 'com.github.SoltauFintel.amalia:amalia-http:3.0.0-a3'
-    implementation 'com.github.SoltauFintel.amalia:amalia-git:3.0.0-a3'
+    implementation 'com.github.SoltauFintel.amalia:amalia-http:3.0.0-a5'
+    implementation 'com.github.SoltauFintel.amalia:amalia-git:3.0.0-a5'
     implementation 'org.yaml:snakeyaml:2.6'
     implementation 'org.slf4j:slf4j-nop:2.0.17'
     

@@ -36,7 +36,8 @@ public class ParmaService {
         // Git part ----
         config.getRepository().getLocalFolder().getParentFile().mkdirs();
         var repo = new Repository(config.getRepository());
-        repo.pull(false);
+        repo.pull(true, false); // rebase
+        handleRebaseResult(repo.getRebaseResult());
         var id = repo.getCurrentCommitHash();
         var folder1 = config.getRepository().getLocalFolder();
         
@@ -56,11 +57,12 @@ public class ParmaService {
         }
     }
     
+    protected void handleRebaseResult(String rebaseResult) {
+    }
+    
     public void saveAlertRuleFiles(AlertRulesFiles files) {
         RepositoryDefinition rd = config.getRepository();
-        rd.getLocalFolder().getParentFile().mkdirs();
         var repo = new Repository(rd);
-        repo.pull(false);
         if (files.getCommitHash() != null && !files.getCommitHash().equals(repo.getCurrentCommitHash())) {
             throw new RuntimeException("Concurrent modification of alert rules files! It is not saved.");
         }
@@ -71,8 +73,21 @@ public class ParmaService {
             FileService.savePlainTextFile(new File(folder2, file.getName()), file.yaml());
         }
         
-        repo.commit("update alert rules", rd.getUser(), config.getMailAddress(), rd.getUser(), rd.getPassword());
+        repo.commit("update alert rules", rd.getUser(), config.getMailAddress());
         files.setCommitHash(repo.getCurrentCommitHash());
+    }
+    
+    /**
+     * @return 1: local branch has unpushed commits / 0: local branch must not be pushed /
+     * 2: remote branch does not exist yet; all commits have to be pushed.
+     */
+    public int hasUnpushedCommits() {
+        return new Repository(config.getRepository()).hasUnpushedCommits("refs/heads/master", "refs/remotes/origin/master");
+    }
+    
+    public void push() {
+        RepositoryDefinition rd = config.getRepository();
+        new Repository(rd).push(rd.getUser(), rd.getPassword());
     }
 
     public List<Silence> getSilences() {
